@@ -8,8 +8,14 @@ class Attendance extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['employee_id', 'type', 'date', 'time'];
-
+ // En app/Models/Attendance.php
+protected $fillable = [
+    'employee_id', 
+    'type', 
+    'date', 
+    'time', 
+    'status'  // ← Agrega esto
+];
     public $timestamps = true;
 
     // 👇 Relación con empleados

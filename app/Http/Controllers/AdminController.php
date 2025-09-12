@@ -27,13 +27,18 @@ class AdminController extends Controller
         return redirect()->back()->with('admin_error', 'Credenciales administrativas incorrectas');
     }
 
-    // 🔹 Mostrar el panel administrativo
-public function panel()
-{
-    $attendances = \App\Models\Attendance::with('empleado')->get();
-    return view('admin', compact('attendances'));
-}
-
-
-
+    // 🔹 Mostrar el panel administrativo CON FILTRO
+    public function panel(Request $request)
+    {
+        $query = \App\Models\Attendance::with('empleado');
+        
+        // Si hay filtro por fecha
+        if ($request->filled('date_filter')) {
+            $query->where('date', $request->date_filter);
+        }
+        
+        $attendances = $query->orderBy('created_at', 'desc')->get();
+        
+        return view('admin', compact('attendances'));
+    }
 }

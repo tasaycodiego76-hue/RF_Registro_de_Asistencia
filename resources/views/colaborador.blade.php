@@ -245,9 +245,11 @@
         @if(session('error'))
             document.addEventListener('DOMContentLoaded', function(){ showMessage("{{ session('error') }}",'error'); });
         @endif
-        @if(session('warning'))
-            document.addEventListener('DOMContentLoaded', function(){ showMessage("{{ session('warning') }}",'warning'); });
-        @endif
+@if(session('warning'))
+    document.addEventListener('DOMContentLoaded', function(){
+        showMessage("{{ session('warning') }}", 'warning'); // O 'error' si no tienes tipo warning
+    });
+@endif
     </script>
 </body>
 </html>
