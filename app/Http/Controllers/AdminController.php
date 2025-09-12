@@ -34,4 +34,6 @@ public function panel()
     return view('admin', compact('attendances'));
 }
 
+
+
 }
