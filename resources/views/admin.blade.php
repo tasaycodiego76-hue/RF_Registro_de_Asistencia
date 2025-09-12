@@ -81,21 +81,35 @@
                     <th>Tipo</th>
                     <th>Fecha</th>
                     <th>Hora</th>
+                      <th>Acciones</th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach($attendances as $attendance)
-                    <tr>
-                        <td>{{ $attendance->employee_id }}</td>
-                        <td>{{ $attendance->empleado->name ?? 'Desconocido' }}</td>
-                        <td class="{{ $attendance->type === 'entrada' ? 'status-entrada' : 'status-salida' }}">
-                            {{ ucfirst($attendance->type) }}
-                        </td>
-                        <td>{{ $attendance->date }}</td>
-                        <td>{{ $attendance->time }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
+<tbody>
+    @foreach($attendances as $attendance)
+        <tr>
+            <td>{{ $attendance->employee_id }}</td>
+            <td>{{ $attendance->empleado->name ?? 'Desconocido' }}</td>
+            <td class="{{ $attendance->type === 'entrada' ? 'status-entrada' : 'status-salida' }}">
+                {{ ucfirst($attendance->type) }}
+            </td>
+            <td>{{ $attendance->date }}</td>
+            <td>{{ \Carbon\Carbon::parse($attendance->time)->format('H:i:s') }}</td>
+            <!-- ↓ AGREGA ESTA CELDA ↓ -->
+            <td>
+                <form method="POST" action="{{ route('attendance.destroy', $attendance->id) }}" style="display: inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" 
+                            style="background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;"
+                            onclick="return confirm('¿Seguro que quieres eliminar este registro?')">
+                        🗑️ Eliminar
+                    </button>
+                </form>
+            </td>
+            <!-- ↑ HASTA AQUÍ ↑ -->
+        </tr>
+    @endforeach
+</tbody>
         </table>
     </div>
 </body>

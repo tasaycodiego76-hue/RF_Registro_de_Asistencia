@@ -18,11 +18,26 @@ class AttendanceController extends Controller
             'employee_id' => $request->input('employee_id'),
             'type' => $request->input('type'),
             'date' => now()->toDateString(),
-            'time' => now()->toTimeString(),
+            'time' => now()->format('H:i:s'),
         ]);
 
         return redirect()->back()->with('success', '✅ Asistencia registrada correctamente.');
     }
-    
+
+    // En AttendanceController.php - agrega este método después de store()
+
+// En AttendanceController.php - agrega este método después de store()
+
+public function destroy($id)
+{
+    try {
+        $attendance = Attendance::findOrFail($id);
+        $attendance->delete();
+        
+        return redirect()->back()->with('success', '🗑️ Registro eliminado correctamente.');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', '❌ Error al eliminar el registro.');
+    }
+}
 }
 

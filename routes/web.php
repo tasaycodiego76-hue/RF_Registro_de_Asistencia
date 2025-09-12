@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AdminController;
 
-// ✅ Vista principal (colaboradores)
+// ✅ Vista principal (colaboradoress)
 Route::get('/', function () {
     return view('colaborador');
 })->name('colaborador.login');
@@ -17,3 +17,6 @@ Route::post('/admin/login', [AdminController::class, 'login'])->name('admin.logi
 
 // ✅ Panel administrativo (ver registros)
 Route::get('/admin/panel', [AdminController::class, 'panel'])->name('admin.panel');
+
+// En routes/web.php - agrega esta línea
+Route::delete('/attendance/{id}', [AttendanceController::class, 'destroy'])->name('attendance.destroy');
