@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Administrativo - Control de Asistencias</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -13,51 +14,68 @@
 
         body {
             font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            background: #f8f9fa;
             min-height: 100vh;
-            color: #fff;
+            color: #2d2d2d;
             overflow-x: auto;
         }
 
         .header {
-            background: linear-gradient(90deg, #000000 0%, #2d2d2d 50%, #000000 100%);
-            padding: 30px 0;
+            background: #000000;
+            padding: 25px 0;
             box-shadow: 0 4px 20px rgba(255, 193, 7, 0.3);
             border-bottom: 3px solid #ffc107;
             position: relative;
         }
 
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20" fill="none"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23ffc107" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="20" fill="url(%23grid)"/></svg>') repeat;
-            opacity: 0.1;
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .home-btn {
+            background: #ffc107;
+            color: #000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(255, 193, 7, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .home-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(255, 193, 7, 0.6);
         }
 
         h1 {
-            text-align: center;
-            font-size: 2.8rem;
+            font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(45deg, #ffc107, #fff);
+            background: linear-gradient(45deg, #ffc107, #ffeb3b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: 0 0 30px rgba(255, 193, 7, 0.5);
-            position: relative;
-            z-index: 1;
+            text-shadow: 0 0 20px rgba(255, 193, 7, 0.3);
         }
 
         .subtitle {
-            text-align: center;
-            margin-top: 10px;
             font-size: 1.1rem;
             color: #ccc;
-            position: relative;
-            z-index: 1;
         }
 
         .main-container {
@@ -67,12 +85,12 @@
         }
 
         .filter-section {
-            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+            background: #ffffff;
             padding: 25px;
             border-radius: 15px;
             margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border: 1px solid #ffc107;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            border: 2px solid #ffc107;
             position: relative;
         }
 
@@ -158,23 +176,23 @@
         }
 
         .btn-clear {
-            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            background: #2d2d2d;
             color: white;
-            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.4);
+            box-shadow: 0 4px 15px rgba(45, 45, 45, 0.4);
         }
 
         .btn-clear:hover {
-            background: linear-gradient(135deg, #495057 0%, #343a40 100%);
+            background: #000000;
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.6);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
         }
 
         .table-container {
-            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            border: 1px solid #ffc107;
+            border: 2px solid #ffc107;
             position: relative;
         }
 
@@ -189,7 +207,7 @@
         }
 
         .table-header {
-            background: linear-gradient(135deg, #000000 0%, #2d2d2d 100%);
+            background: #000000;
             padding: 20px;
             color: #fff;
             text-align: center;
@@ -200,7 +218,7 @@
             font-size: 1.5rem;
             font-weight: 700;
             margin-bottom: 8px;
-            background: linear-gradient(45deg, #ffc107, #fff);
+            background: linear-gradient(45deg, #ffc107, #ffeb3b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -239,9 +257,9 @@
         }
 
         tbody tr:hover {
-            background: linear-gradient(135deg, #fff9c4 0%, #fff3cd 100%);
+            background: rgba(255, 193, 7, 0.1);
             transform: scale(1.005);
-            box-shadow: 0 2px 10px rgba(255, 193, 7, 0.2);
+            box-shadow: 0 2px 10px rgba(255, 193, 7, 0.1);
         }
 
         tbody tr:nth-child(even) {
@@ -249,7 +267,7 @@
         }
 
         tbody tr:nth-child(even):hover {
-            background: linear-gradient(135deg, #fff9c4 0%, #fff3cd 100%);
+            background: rgba(255, 193, 7, 0.1);
         }
 
         tbody td {
@@ -260,11 +278,12 @@
 
         .employee-id {
             font-family: 'Courier New', monospace;
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            background: #f8f9fa;
             padding: 6px 10px;
             border-radius: 6px;
             font-weight: 700;
             color: #000;
+            border: 1px solid #e0e0e0;
         }
 
         .employee-name {
@@ -287,9 +306,9 @@
         }
 
         .status-puntual {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: #28a745;
             color: white;
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: 700;
@@ -302,9 +321,9 @@
         }
 
         .status-tardanza {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background: #dc3545;
             color: white;
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 20px;
             font-size: 11px;
             font-weight: 700;
@@ -314,13 +333,6 @@
             align-items: center;
             gap: 6px;
             box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3); }
-            50% { box-shadow: 0 2px 12px rgba(220, 53, 69, 0.6); }
-            100% { box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3); }
         }
 
         .status-na {
@@ -333,10 +345,11 @@
             font-family: 'Courier New', monospace;
             font-weight: 700;
             color: #000;
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            background: #f8f9fa;
             padding: 6px 10px;
             border-radius: 6px;
             display: inline-block;
+            border: 1px solid #e0e0e0;
         }
 
         .date-display {
@@ -345,10 +358,10 @@
         }
 
         .btn-delete {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background: #dc3545;
             color: white;
             border: none;
-            padding: 10px 16px;
+            padding: 8px 14px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 13px;
@@ -357,10 +370,13 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .btn-delete:hover {
-            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+            background: #c82333;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(220, 53, 69, 0.5);
         }
@@ -381,19 +397,26 @@
             border-radius: 12px;
             font-weight: 600;
             font-size: 16px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
         .alert-success {
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            background: #d4edda;
             color: #155724;
             border-left: 6px solid #28a745;
         }
 
         .alert-error {
-            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            background: #f8d7da;
             color: #721c24;
             border-left: 6px solid #dc3545;
+        }
+
+        .alert i {
+            font-size: 1.5rem;
         }
 
         .empty-state {
@@ -424,6 +447,12 @@
                 padding: 20px 15px;
             }
             
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
             h1 {
                 font-size: 2rem;
             }
@@ -450,8 +479,17 @@
 </head>
 <body>
     <div class="header">
-        <h1> Panel Administrativo</h1>
-        <p class="subtitle">Sistema de Control de Asistencias Empresarial</p>
+        <div class="header-content">
+            <div class="header-left">
+                <a href="/dashboard" class="home-btn" title="Volver al inicio">
+                    <i class="fas fa-home"></i>
+                </a>
+                <div>
+                    <h1>Panel Administrativo</h1>
+                    <p class="subtitle">Sistema de Control de Asistencias Empresarial</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="main-container">
@@ -459,7 +497,7 @@
         <div class="filter-section">
             <form method="GET" class="date-filter-form">
                 <div class="filter-group">
-                    <label for="date_filter">📅 Filtrar por fecha:</label>
+                    <label for="date_filter"><i class="fas fa-calendar-alt"></i> Filtrar por fecha:</label>
                     <input type="date" 
                            id="date_filter" 
                            name="date_filter" 
@@ -468,10 +506,10 @@
                 </div>
                 <div class="filter-group">
                     <button type="submit" class="btn-filter">
-                        🔍 Filtrar
+                        <i class="fas fa-filter"></i> Filtrar
                     </button>
                     <a href="{{ url()->current() }}" class="btn-clear">
-                        🔄 Limpiar Filtros
+                        <i class="fas fa-times"></i> Limpiar
                     </a>
                 </div>
             </form>
@@ -480,13 +518,15 @@
         <!-- Mostrar mensajes de éxito o error -->
         @if(session('success'))
             <div class="alert alert-success">
-                {{ session('success') }}
+                <i class="fas fa-check-circle"></i>
+                <div>{{ session('success') }}</div>
             </div>
         @endif
 
         @if(session('error'))
             <div class="alert alert-error">
-                {{ session('error') }}
+                <i class="fas fa-exclamation-circle"></i>
+                <div>{{ session('error') }}</div>
             </div>
         @endif
 
@@ -525,14 +565,18 @@
                                     <span class="employee-name">{{ $attendance->empleado->name ?? 'Usuario Desconocido' }}</span>
                                 </td>
                                 <td class="{{ $attendance->type === 'entrada' ? 'status-entrada' : 'status-salida' }}">
-                                    {{ $attendance->type === 'entrada' ? '🟢 Entrada' : '🔴 Salida' }}
+                                    @if($attendance->type === 'entrada')
+                                        <i class="fas fa-sign-in-alt"></i> Entrada
+                                    @else
+                                        <i class="fas fa-sign-out-alt"></i> Salida
+                                    @endif
                                 </td>
                                 <td>
                                     @if($attendance->type === 'entrada')
                                         @if($attendance->status === 'puntual')
-                                            <span class="status-puntual">✅ Puntual</span>
+                                            <span class="status-puntual"><i class="fas fa-check"></i> Puntual</span>
                                         @elseif($attendance->status === 'tardanza')
-                                            <span class="status-tardanza">⏰ Tardanza</span>
+                                            <span class="status-tardanza"><i class="fas fa-clock"></i> Tardanza</span>
                                         @else
                                             <span class="status-na">Sin estado</span>
                                         @endif
@@ -553,7 +597,7 @@
                                         @method('DELETE')
                                         <button type="submit" class="btn-delete" title="Eliminar registro"
                                                 onclick="return confirm('⚠️ ¿Está seguro de eliminar este registro?\n\nEsta acción es irreversible.')">
-                                            🗑️ Eliminar
+                                            <i class="fas fa-trash"></i> Eliminar
                                         </button>
                                     </form>
                                 </td>
@@ -563,7 +607,9 @@
                 </table>
             @else
                 <div class="empty-state">
-                    <div style="font-size: 4rem; margin-bottom: 20px;">📋</div>
+                    <div style="font-size: 4rem; margin-bottom: 20px;">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
                     <h3>No hay registros de asistencia</h3>
                     <p>
                         @if(request('date_filter'))
