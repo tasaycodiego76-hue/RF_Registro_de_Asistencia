@@ -20,3 +20,7 @@ Route::get('/admin/panel', [AdminController::class, 'panel'])->name('admin.panel
 
 // En routes/web.php - agrega esta línea
 Route::delete('/attendance/{id}', [AttendanceController::class, 'destroy'])->name('attendance.destroy');
+
+Route::get('/admin/asistencia/{id}', [AdminController::class, 'show'])->name('admin.show');
+Route::get('/admin/export-excel', [AdminController::class, 'exportExcel'])->name('admin.export');
+Route::get('/admin/quincenal', [AdminController::class, 'quincenal'])->name('admin.quincenal');

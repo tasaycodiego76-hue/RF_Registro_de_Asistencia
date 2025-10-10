@@ -15,7 +15,7 @@ class Employee extends Model
     // 👇 Relación con asistencias
     public function asistencias()
     {
-        return $this->hasMany(Attendance::class, 'employee_id', 'id');
+          return $this->hasMany(Attendance::class, 'employee_id', 'employee_id');
     }
 }
 

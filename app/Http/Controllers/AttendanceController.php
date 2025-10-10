@@ -78,15 +78,18 @@ class AttendanceController extends Controller
         return redirect()->back()->with('success', '✅ Asistencia registrada correctamente.');
     }
 
-    public function destroy($id)
-    {
-        try {
-            $attendance = Attendance::findOrFail($id);
-            $attendance->delete();
-            
-            return redirect()->back()->with('success', '🗑️ Registro eliminado correctamente.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', '❌ Error al eliminar el registro.');
-        }
+public function destroy($id)
+{
+    try {
+        $attendance = Attendance::findOrFail($id);
+        $attendance->delete();
+        
+        // Redirige de vuelta sin ningún mensaje
+        return redirect()->back();
+    } catch (\Exception $e) {
+        // También redirige sin mostrar mensaje de error
+        return redirect()->back();
     }
+}
+
 }
