@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Attendance;
+use App\Models\Employee; // <-- Agregado
 
 class AttendanceController extends Controller
 {
@@ -11,13 +12,24 @@ class AttendanceController extends Controller
     {
         $request->validate([
             'employee_id' => 'required|string',
+            'password' => 'required|string', // <-- Aseguramos que venga la contraseña
             'type' => 'required|in:entrada,salida',
         ]);
 
         $employee_id = $request->input('employee_id');
+        $password = $request->input('password'); // <-- Obtenemos la contraseña ingresada
         $type = $request->input('type');
         $today = now()->toDateString();
-        $currentTime = now(); // ← Solo agregué esta línea
+        $currentTime = now();
+
+        // ✅ Verificar si el ID y la contraseña coinciden
+        $employee = Employee::where('employee_id', $employee_id)
+                            ->where('password', $password)
+                            ->first();
+
+        if (!$employee) {
+            return redirect()->back()->with('error', '❌ ID o contraseña incorrectos.');
+        }
 
         // Verificar registros de hoy para este empleado
         $todayAttendances = Attendance::where('employee_id', $employee_id)
@@ -26,47 +38,35 @@ class AttendanceController extends Controller
 
         // Si intenta registrar ENTRADA
         if ($type === 'entrada') {
-            // Verificar si ya tiene entrada hoy
             $hasEntrada = $todayAttendances->where('type', 'entrada')->first();
-            
             if ($hasEntrada) {
-                return redirect()->back()->with('error', '⚠️ Ya registraste tu ENTRADA hoy a las ' . 
-                    \Carbon\Carbon::parse($hasEntrada->time)->format('H:i:s') . 
+                return redirect()->back()->with('error', '⚠️ Ya registraste tu ENTRADA hoy a las ' .
+                    \Carbon\Carbon::parse($hasEntrada->time)->format('H:i:s') .
                     '. Solo puedes registrar una entrada por día.');
             }
         }
 
         // Si intenta registrar SALIDA
         if ($type === 'salida') {
-            // Verificar si tiene entrada hoy
             $hasEntrada = $todayAttendances->where('type', 'entrada')->first();
-            
             if (!$hasEntrada) {
-                return redirect()->back()->with('error', '⚠️ Debes registrar tu ENTRADA primero antes de poder registrar la salida.');
+                return redirect()->back()->with('error', '⚠️ Debes registrar tu ENTRADA primero.');
             }
 
-            // Verificar si ya tiene salida hoy
             $hasSalida = $todayAttendances->where('type', 'salida')->first();
-            
             if ($hasSalida) {
-                return redirect()->back()->with('error', '⚠️ Ya registraste tu SALIDA hoy a las ' . 
-                    \Carbon\Carbon::parse($hasSalida->time)->format('H:i:s') . 
-                    '. Solo puedes registrar una salida por día.');
+                return redirect()->back()->with('error', '⚠️ Ya registraste tu SALIDA hoy.');
             }
         }
 
-        // ↓ NUEVA LÓGICA DE TARDANZA (solo para entradas) ↓
+        // Estado de tardanza solo para entradas
         $status = null;
         if ($type === 'entrada') {
-            // Hora límite: 9:15 AM
             $limitTime = $currentTime->copy()->setTime(9, 15, 0);
             $status = $currentTime->lessThanOrEqualTo($limitTime) ? 'puntual' : 'tardanza';
         }
-        // ↑ HASTA AQUÍ ↑
 
-        // Si pasa todas las validaciones, crear el registro
- // Si pasa todas las validaciones, crear el registro
-        $attendance = Attendance::create([
+        Attendance::create([
             'employee_id' => $employee_id,
             'type' => $type,
             'date' => $today,
@@ -74,22 +74,17 @@ class AttendanceController extends Controller
             'status' => $status,
         ]);
 
-        // ↓ MENSAJE ÚNICO SILENCIOSO ↓
         return redirect()->back()->with('success', '✅ Asistencia registrada correctamente.');
     }
 
-public function destroy($id)
-{
-    try {
-        $attendance = Attendance::findOrFail($id);
-        $attendance->delete();
-        
-        // Redirige de vuelta sin ningún mensaje
-        return redirect()->back();
-    } catch (\Exception $e) {
-        // También redirige sin mostrar mensaje de error
-        return redirect()->back();
+    public function destroy($id)
+    {
+        try {
+            $attendance = Attendance::findOrFail($id);
+            $attendance->delete();
+            return redirect()->back();
+        } catch (\Exception $e) {
+            return redirect()->back();
+        }
     }
-}
-
 }

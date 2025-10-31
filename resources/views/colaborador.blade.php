@@ -107,7 +107,7 @@
             padding-top:20px;
         }
         .admin-link a {
-            color:#FFD700;
+            color: #000;;
             font-weight:600;
             cursor:pointer;
         }
