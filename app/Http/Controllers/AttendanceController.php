@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Attendance;
 use App\Models\Employee; // <-- Agregado
+use Milon\Barcode\DNS1D;
 
 class AttendanceController extends Controller
 {
@@ -87,4 +88,9 @@ class AttendanceController extends Controller
             return redirect()->back();
         }
     }
+    public function showBarcode($employee_id)
+{
+    $employee = Employee::where('employee_id', $employee_id)->firstOrFail();
+    return view('employee_barcode', compact('employee'));
+}
 }

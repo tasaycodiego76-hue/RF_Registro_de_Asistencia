@@ -146,110 +146,112 @@
             color:#444;
             cursor:pointer;
         }
+        
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="form-group">
-            <label for="employeeId">ID de Colaborador</label>
-            <input type="text" id="employeeId" placeholder="Ingrese su ID" required>
-        </div>
-        <div class="form-group">
-            <label for="password">Contraseña</label>
-            <input type="password" id="password" placeholder="Ingrese su contraseña" required>
-        </div>
-        <div class="buttons">
-            <button class="btn entrada-btn" onclick="registerAttendance('entrada')">ENTRADA</button>
-            <button class="btn salida-btn" onclick="registerAttendance('salida')">SALIDA</button>
-        </div>
+   <div class="container">
+    <!-- Input de código de barras -->
+    <input type="text" id="barcodeInput" placeholder="Escanea tu tarjeta" autofocus>
 
-        <!-- Mensajes -->
-        <div class="status-message" id="statusMessage"
-             style="@if(session('success') || session('error') || session('warning')) display:block; @else display:none; @endif">
-            @if(session('success')) {{ session('success') }}
-            @elseif(session('error')) {{ session('error') }}
-            @elseif(session('warning')) {{ session('warning') }}
-            @endif
-        </div>
-
-        <div class="admin-link">
-            <a onclick="openAdminModal()">Acceso Administrativo</a>
-        </div>
-    </div>
-
-    <!-- FORMULARIO OCULTO -->
+    <!-- Formulario oculto para registrar asistencia -->
     <form id="attendanceForm" method="POST" action="{{ route('attendance.store') }}" style="display:none;">
         @csrf
         <input type="hidden" name="employee_id" id="formEmployeeId">
-        <input type="hidden" name="password" id="formPassword">
         <input type="hidden" name="type" id="formType">
     </form>
 
-    <!-- Modal admin -->
-    <div class="modal" id="adminModal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeAdminModal()">&times;</span>
-            <h2>Acceso Administrativo</h2>
-            <form id="adminLoginForm" method="POST" action="{{ route('admin.login') }}">
-                @csrf
-                <div class="form-group">
-                    <input type="text" id="adminUser" name="user" placeholder="Usuario" required>
-                </div>
-                <div class="form-group">
-                    <input type="password" id="adminPass" name="password" placeholder="Contraseña" required>
-                </div>
-                <button type="submit" class="btn entrada-btn">Ingresar</button>
-            </form>
-        </div>
+    <!-- Mensajes -->
+    <div class="status-message" id="statusMessage"
+         style="@if(session('success') || session('error') || session('warning')) display:block; @else display:none; @endif">
+        @if(session('success')) {{ session('success') }}
+        @elseif(session('error')) {{ session('error') }}
+        @elseif(session('warning')) {{ session('warning') }}
+        @endif
     </div>
 
-    <script>
-        function registerAttendance(type) {
-            const employeeId = document.getElementById('employeeId').value.trim();
-            const password = document.getElementById('password').value.trim();
-            if (!employeeId || !password) {
-                showMessage('Por favor complete todos los campos', 'error');
-                return;
-            }
+    <!-- Acceso Administrativo -->
+    <div class="admin-link">
+        <a onclick="openAdminModal()">Acceso Administrativo</a>
+    </div>
+</div>
+
+<!-- Modal de administración -->
+<div class="modal" id="adminModal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeAdminModal()">&times;</span>
+        <h2>Acceso Administrativo</h2>
+        <form id="adminLoginForm" method="POST" action="{{ route('admin.login') }}">
+            @csrf
+            <div class="form-group">
+                <input type="text" id="adminUser" name="user" placeholder="Usuario" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="adminPass" name="password" placeholder="Contraseña" required>
+            </div>
+            <button type="submit" class="btn entrada-btn">Ingresar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Registrar asistencia automáticamente con código de barras
+    const barcodeInput = document.getElementById('barcodeInput');
+
+    barcodeInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const employeeId = barcodeInput.value.trim();
+            if (!employeeId) return showMessage('No se detectó código de barras', 'error');
+
+            // Lógica simple: antes de 12 -> entrada, después -> salida
+            const now = new Date();
+            const hours = now.getHours();
+            const type = hours < 12 ? 'entrada' : 'salida';
+
             document.getElementById('formEmployeeId').value = employeeId;
-            document.getElementById('formPassword').value = password;
             document.getElementById('formType').value = type;
             document.getElementById('attendanceForm').submit();
+
+            barcodeInput.value = ''; // limpiar input
         }
-
-        function showMessage(text, type) {
-            const msg = document.getElementById('statusMessage');
-            msg.textContent = text;
-            msg.className = `status-message ${type}`;
-            msg.style.display = 'block';
-            setTimeout(hideMessage, 3500);
-        }
-
-        function hideMessage() {
-            document.getElementById('statusMessage').style.display = 'none';
-        }
-
-        function openAdminModal(){ document.getElementById('adminModal').style.display = 'flex'; }
-        function closeAdminModal(){ document.getElementById('adminModal').style.display = 'none'; }
-
-        @if(session('admin_error'))
-            document.addEventListener('DOMContentLoaded', function(){
-                openAdminModal();
-                alert("{{ session('admin_error') }}");
-            });
-        @endif
-
-        @if(session('success'))
-            document.addEventListener('DOMContentLoaded', function(){ showMessage("{{ session('success') }}",'success'); });
-        @endif
-        @if(session('error'))
-            document.addEventListener('DOMContentLoaded', function(){ showMessage("{{ session('error') }}",'error'); });
-        @endif
-@if(session('warning'))
-    document.addEventListener('DOMContentLoaded', function(){
-        showMessage("{{ session('warning') }}", 'warning'); // O 'error' si no tienes tipo warning
     });
-@endif
-    </script>
+
+    // Funciones de mensajes
+    function showMessage(text, type) {
+        const msg = document.getElementById('statusMessage');
+        msg.textContent = text;
+        msg.className = `status-message ${type}`;
+        msg.style.display = 'block';
+        setTimeout(hideMessage, 3500);
+    }
+
+    function hideMessage() {
+        document.getElementById('statusMessage').style.display = 'none';
+    }
+
+    // Modal administrativo
+    function openAdminModal(){ document.getElementById('adminModal').style.display = 'flex'; }
+    function closeAdminModal(){ document.getElementById('adminModal').style.display = 'none'; }
+
+    // Mostrar errores de admin si existen
+    @if(session('admin_error'))
+        document.addEventListener('DOMContentLoaded', function(){
+            openAdminModal();
+            alert("{{ session('admin_error') }}");
+        });
+    @endif
+
+    @if(session('success'))
+        document.addEventListener('DOMContentLoaded', function(){ showMessage("{{ session('success') }}",'success'); });
+    @endif
+    @if(session('error'))
+        document.addEventListener('DOMContentLoaded', function(){ showMessage("{{ session('error') }}",'error'); });
+    @endif
+    @if(session('warning'))
+        document.addEventListener('DOMContentLoaded', function(){ showMessage("{{ session('warning') }}", 'warning'); });
+    @endif
+</script>
+
 </body>
 </html>

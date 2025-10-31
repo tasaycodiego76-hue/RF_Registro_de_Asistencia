@@ -17,5 +17,14 @@ class Employee extends Model
     {
           return $this->hasMany(Attendance::class, 'employee_id', 'employee_id');
     }
+    protected static function boot()
+{
+    parent::boot();
+
+    static::creating(function ($employee) {
+        $employee->barcode = 'EMP' . str_pad(Employee::count() + 1, 3, '0', STR_PAD_LEFT);
+    });
+}
+
 }
 
