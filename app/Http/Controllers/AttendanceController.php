@@ -4,8 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Attendance;
-use App\Models\Employee; // <-- Agregado
-use Milon\Barcode\DNS1D;
+use App\Models\Employee;
 
 class AttendanceController extends Controller
 {
@@ -13,71 +12,63 @@ class AttendanceController extends Controller
     {
         $request->validate([
             'employee_id' => 'required|string',
-            'password' => 'required|string', // <-- Aseguramos que venga la contraseña
-            'type' => 'required|in:entrada,salida',
         ]);
 
         $employee_id = $request->input('employee_id');
-        $password = $request->input('password'); // <-- Obtenemos la contraseña ingresada
-        $type = $request->input('type');
         $today = now()->toDateString();
         $currentTime = now();
 
-        // ✅ Verificar si el ID y la contraseña coinciden
-        $employee = Employee::where('employee_id', $employee_id)
-                            ->where('password', $password)
-                            ->first();
+        // Buscar empleado
+        $employee = Employee::where('employee_id', $employee_id)->first();
 
         if (!$employee) {
-            return redirect()->back()->with('error', '❌ ID o contraseña incorrectos.');
+            return redirect()->back()->with('error', '❌ ID de empleado no existe.');
         }
 
-        // Verificar registros de hoy para este empleado
+        // Registros de hoy
         $todayAttendances = Attendance::where('employee_id', $employee_id)
-                                    ->where('date', $today)
-                                    ->get();
+                                      ->where('date', $today)
+                                      ->get();
 
-        // Si intenta registrar ENTRADA
-        if ($type === 'entrada') {
-            $hasEntrada = $todayAttendances->where('type', 'entrada')->first();
-            if ($hasEntrada) {
-                return redirect()->back()->with('error', '⚠️ Ya registraste tu ENTRADA hoy a las ' .
-                    \Carbon\Carbon::parse($hasEntrada->time)->format('H:i:s') .
-                    '. Solo puedes registrar una entrada por día.');
+        $hasEntrada = $todayAttendances->where('type','entrada')->first();
+        $hasSalida  = $todayAttendances->where('type','salida')->first();
+
+        if (!$hasEntrada) {
+            // Registrar entrada
+            $status = $currentTime->lessThanOrEqualTo($currentTime->copy()->setTime(9,15,0)) ? 'puntual' : 'tardanza';
+
+            Attendance::create([
+                'employee_id' => $employee_id,
+                'type' => 'entrada',
+                'date' => $today,
+                'time' => $currentTime->format('H:i:s'),
+                'status' => $status,
+            ]);
+
+            return redirect()->back()->with('success', '✅ ENTRADA registrada correctamente.');
+        }
+
+        // Si ya tiene entrada, no registrar otra
+        if (!$hasSalida) {
+            $limitExit = $currentTime->copy()->setTime(18,0,0);
+            if ($currentTime->lessThan($limitExit)) {
+                return redirect()->back()->with('warning', '⚠️ Solo puedes registrar tu SALIDA después de las 6:00 PM.');
+            } else {
+                // Registrar salida
+                Attendance::create([
+                    'employee_id' => $employee_id,
+                    'type' => 'salida',
+                    'date' => $today,
+                    'time' => $currentTime->format('H:i:s'),
+                    'status' => null,
+                ]);
+                return redirect()->back()->with('success', '✅ SALIDA registrada correctamente.');
             }
         }
 
-        // Si intenta registrar SALIDA
-        if ($type === 'salida') {
-            $hasEntrada = $todayAttendances->where('type', 'entrada')->first();
-            if (!$hasEntrada) {
-                return redirect()->back()->with('error', '⚠️ Debes registrar tu ENTRADA primero.');
-            }
-
-            $hasSalida = $todayAttendances->where('type', 'salida')->first();
-            if ($hasSalida) {
-                return redirect()->back()->with('error', '⚠️ Ya registraste tu SALIDA hoy.');
-            }
-        }
-
-        // Estado de tardanza solo para entradas
-        $status = null;
-        if ($type === 'entrada') {
-            $limitTime = $currentTime->copy()->setTime(9, 15, 0);
-            $status = $currentTime->lessThanOrEqualTo($limitTime) ? 'puntual' : 'tardanza';
-        }
-
-        Attendance::create([
-            'employee_id' => $employee_id,
-            'type' => $type,
-            'date' => $today,
-            'time' => $currentTime->format('H:i:s'),
-            'status' => $status,
-        ]);
-
-        return redirect()->back()->with('success', '✅ Asistencia registrada correctamente.');
+        // Ya tiene entrada y salida
+        return redirect()->back()->with('warning', '⚠️ Ya registraste tu ENTRADA y SALIDA hoy.');
     }
-
     public function destroy($id)
     {
         try {

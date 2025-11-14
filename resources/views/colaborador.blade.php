@@ -146,7 +146,7 @@
             color:#444;
             cursor:pointer;
         }
-        
+
     </style>
 </head>
 <body>
@@ -252,6 +252,30 @@
         document.addEventListener('DOMContentLoaded', function(){ showMessage("{{ session('warning') }}", 'warning'); });
     @endif
 </script>
+
+<button id="testScanBtn" style="position:fixed;bottom:20px;right:20px;padding:10px 15px;z-index:1000;">Simular Escaneo</button>
+
+<script>
+document.getElementById('testScanBtn').addEventListener('click', function() {
+    const fakeId = 'EMP008'; // cambia a cualquier empleado
+
+    const barcodeInput = document.getElementById('barcodeInput');
+    barcodeInput.value = fakeId;
+
+    document.getElementById('formEmployeeId').value = fakeId;
+
+    // Forzar entrada para la prueba
+    document.getElementById('formType').value = 'entrada';
+
+    document.getElementById('attendanceForm').submit();
+
+    barcodeInput.value = '';
+
+});
+</script>
+
+
+
 
 </body>
 </html>
